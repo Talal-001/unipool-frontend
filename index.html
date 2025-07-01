@@ -1,0 +1,2174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniPool - Campus Ride Sharing</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --bg-card: #fff;
+            --text: #222;
+            --text-secondary: #555;
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --border: #e0e7ff;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --error: #ef4444;
+            --success: #10b981;
+        }
+        [data-theme="dark"] {
+            --bg: #181a20;
+            --bg-card: #23272f;
+            --text: #f1f5f9;
+            --text-secondary: #a0aec0;
+            --primary: #818cf8;
+            --secondary: #a78bfa;
+            --border: #313244;
+            --shadow: 0 4px 15px rgba(0,0,0,0.4);
+            --error: #f87171;
+            --success: #34d399;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .app {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .role-btn {
+            padding: 20px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .role-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .role-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+        
+        .role-btn i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-card);
+            color: var(--text);
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .success-message {
+            color: var(--success);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .role-selector {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .card h2 {
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .location-picker {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .location-picker select,
+        .location-picker input {
+            flex: 1;
+        }
+        
+        .or-text {
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 0 5px;
+        }
+        
+        .ride-card {
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+            background: var(--bg-card);
+        }
+        
+        .ride-card:hover {
+            border-color: var(--primary);
+        }
+        
+        .ride-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .ride-route {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 5px;
+        }
+        
+        .ride-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .ride-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stars {
+            color: #fbbf24;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            background: var(--success);
+        }
+        
+        .notification.error {
+            background: var(--error);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+        
+        .search-filters {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .bookings-list {
+            margin-top: 15px;
+        }
+        
+        .booking-item {
+            background: var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .admin-panel {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+        
+        .user-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--error);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .theme-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 100px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            width: auto;
+            min-width: 40px;
+        }
+        
+        .verification-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        
+        .verification-code {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .verification-code input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text);
+        }
+        
+        .verification-code input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .resend-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .current-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: var(--border);
+            border-radius: 8px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .header-notification {
+            position: absolute;
+            top: 20px;
+            right: 60px;
+            background: var(--bg-card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            min-width: 120px;
+            box-shadow: var(--shadow);
+            font-size: 14px;
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const POPULAR_AREAS = [
+            "DHA Phase 1", "DHA Phase 2", "DHA Phase 3", "DHA Phase 4", "DHA Phase 5", "DHA Phase 6",
+            "Gulberg I", "Gulberg II", "Gulberg III", "Model Town", "Garden Town", "Township",
+            "Johar Town", "Wapda Town", "PIA Society", "Cavalry Ground", "Cantt", "Mall Road",
+            "Liberty Market", "MM Alam Road", "Main Boulevard", "Canal Road", "Jail Road",
+            "Ferozepur Road", "Multan Road", "GT Road", "Raiwind Road", "FCC", "Other"
+        ];
+
+        const { useState, useEffect } = React;
+
+        // Data Service
+        class DataService {
+            constructor() {
+                this.API_BASE = 'https://unipool-backend-production.up.railway.app/api';
+            }
+
+            getToken() {
+                return localStorage.getItem('token');
+            }
+
+            setToken(token) {
+                localStorage.setItem('token', token);
+            }
+
+            clearToken() {
+                localStorage.removeItem('token');
+            }
+
+            setCurrentUser(user) {
+                localStorage.setItem('unipool_current_user', JSON.stringify(user));
+            }
+
+            logout() {
+                localStorage.removeItem('token');
+                localStorage.removeItem('unipool_current_user');
+            }
+
+            validateEmail(email) {
+                return (
+                    email.endsWith('@formanite.fccollege.edu.pk') ||
+                    email.endsWith('@fccollege.edu.pk')
+                );
+            }
+
+            async login(email, password) {
+                const res = await fetch(`${this.API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    this.setToken(data.token);
+                    return { user: data.user, token: data.token };
+                } else {
+                    throw new Error(data.message || 'Login failed');
+                }
+            }
+
+            async register(userData) {
+                const res = await fetch(`${this.API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    return data.user;
+                } else {
+                    throw new Error(data.message || 'Registration failed');
+                }
+            }
+
+            async getCurrentUser() {
+                const token = this.getToken();
+                if (!token) return null;
+                try {
+                    const res = await fetch(`${this.API_BASE}/users/me`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const user = await res.json();
+                        return user;
+                    } else if (res.status === 401) {
+                        // Token is invalid, clear it
+                        this.clearToken();
+                        localStorage.removeItem('unipool_current_user');
+                        return null;
+                    }
+                    return null;
+                } catch (error) {
+                    console.error('Error fetching current user:', error);
+                    return null;
+                }
+            }
+
+            async getRides(filters = {}) {
+                try {
+                    const params = new URLSearchParams(filters).toString();
+                    const res = await fetch(`${this.API_BASE}/rides?${params}`);
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    const data = await res.json();
+                    return Array.isArray(data) ? data : [];
+                } catch (error) {
+                    console.error('Error fetching rides:', error);
+                    return [];
+                }
+            }
+
+            async addRide(rideData) {
+                try {
+                    const token = this.getToken();
+                    const res = await fetch(`${this.API_BASE}/rides`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(rideData)
+                    });
+                    if (!res.ok) {
+                        const errorData = await res.json();
+                        throw new Error(errorData.message || 'Failed to add ride');
+                    }
+                    return await res.json();
+                } catch (error) {
+                    console.error('Error adding ride:', error);
+                    throw error;
+                }
+            }
+
+            async bookRide(rideId, bookingData) {
+                try {
+                    const token = this.getToken();
+                    const res = await fetch(`${this.API_BASE}/bookings/${rideId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(bookingData)
+                    });
+                    if (!res.ok) {
+                        const errorData = await res.json();
+                        throw new Error(errorData.message || 'Failed to book ride');
+                    }
+                    return await res.json();
+                } catch (error) {
+                    console.error('Error booking ride:', error);
+                    throw error;
+                }
+            }
+
+            async cancelRide(rideId) {
+                try {
+                    const token = this.getToken();
+                    const res = await fetch(`${this.API_BASE}/bookings/ride/${rideId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!res.ok) {
+                        const errorData = await res.json();
+                        throw new Error(errorData.message || 'Failed to cancel ride');
+                    }
+                    return await res.json();
+                } catch (error) {
+                    console.error('Error cancelling ride:', error);
+                    throw error;
+                }
+            }
+
+            async getUserBookings(userId) {
+                const token = this.getToken();
+                const res = await fetch(`${this.API_BASE}/bookings/user/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return [];
+                return await res.json();
+            }
+
+            async deleteUser(userId) {
+                const token = this.getToken();
+                const res = await fetch(`${this.API_BASE}/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                return await res.json();
+            }
+
+            async getAllUsers() {
+                try {
+                    const token = this.getToken();
+                    if (!token) {
+                        throw new Error('No authentication token');
+                    }
+                    
+                    const res = await fetch(`${this.API_BASE}/users`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (res.status === 401) {
+                        // Token is invalid, clear it
+                        this.clearToken();
+                        localStorage.removeItem('unipool_current_user');
+                        throw new Error('Authentication failed. Please login again.');
+                    }
+                    
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    
+                    const data = await res.json();
+                    return Array.isArray(data) ? data : [];
+                } catch (error) {
+                    console.error('Error fetching users:', error);
+                    if (error.message.includes('Authentication failed')) {
+                        throw error; // Re-throw auth errors
+                    }
+                    return [];
+                }
+            }
+
+            // Mock methods for demo purposes (these would be replaced with real implementations)
+            generateVerificationCode() {
+                return Math.floor(100000 + Math.random() * 900000).toString();
+            }
+
+            async sendVerificationEmail(email, code) {
+                // Mock email sending - in production this would use a real email service
+                console.log(`Verification code ${code} sent to ${email}`);
+                return true;
+            }
+
+            verifyCode(email, code) {
+                // Mock verification - in production this would check against stored codes
+                return true;
+            }
+
+            getData() {
+                // Mock data for demo purposes
+                return {
+                    users: [],
+                    rides: [],
+                    bookings: []
+                };
+            }
+
+            async completeRide(rideId) {
+                try {
+                    const token = this.getToken();
+                    const res = await fetch(`${this.API_BASE}/rides/${rideId}/complete`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (!res.ok) {
+                        const errorData = await res.json();
+                        throw new Error(errorData.message || 'Failed to complete ride');
+                    }
+                    return await res.json();
+                } catch (error) {
+                    console.error('Error completing ride:', error);
+                    throw error;
+                }
+            }
+
+            saveData(data) {
+                // Mock data saving - in production this would save to database
+                console.log('Data saved:', data);
+            }
+        }
+
+        const dataService = new DataService();
+
+        // Components
+        function Notification({ message, type, onClose }) {
+            useEffect(() => {
+                const timer = setTimeout(onClose, 3000);
+                return () => clearTimeout(timer);
+            }, [onClose]);
+
+            return (
+                <div className={`notification ${type}`}>
+                    {message}
+                </div>
+            );
+        }
+
+        function LoginForm({ onLogin, onSwitchToRegister }) {
+            const [formData, setFormData] = useState({
+                email: '',
+                password: ''
+            });
+            const [error, setError] = useState('');
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+
+                if (!formData.email || !formData.password) {
+                    setError('Please fill in all fields');
+                    return;
+                }
+
+                try {
+                    // Regular user login (must have FCC email for non-admin)
+                    if (formData.email !== '000000' && !dataService.validateEmail(formData.email)) {
+                        setError('Only @formanite.fccollege.edu.pk or @fccollege.edu.pk emails are allowed for regular users');
+                        return;
+                    }
+
+                    const result = await dataService.login(formData.email, formData.password);
+                    if (result && result.user && result.token) {
+                        dataService.setCurrentUser(result.user);
+                        localStorage.setItem('token', result.token);
+                        onLogin(result.user, result.token);
+                    } else {
+                        setError('Invalid email or password');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    if (error.message.includes('401')) {
+                        setError('Invalid email or password. Please check your credentials.');
+                    } else if (error.message.includes('500')) {
+                        setError('Server error. Please try again later.');
+                    } else {
+                        setError(error.message || 'Login failed. Please try again.');
+                    }
+                }
+            };
+
+            return (
+                <div className="login-container">
+                    <div className="logo" style={{justifyContent: 'center', marginBottom: '30px'}}>
+                        <i className="fas fa-car"></i>
+                        UniPool
+                    </div>
+                    
+                    <h2 style={{textAlign: 'center', marginBottom: '30px', color: 'var(--text)'}}>
+                        Welcome Back
+                    </h2>
+                    
+                    <div style={{
+                        background: 'var(--border)',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        marginBottom: '20px',
+                        textAlign: 'center'
+                    }}>
+                        <p style={{margin: '0 0 10px 0', color: 'var(--text-secondary)', fontSize: '14px'}}>
+                            <strong>Test Admin Credentials:</strong>
+                        </p>
+                        <div style={{
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            color: 'var(--primary)',
+                            fontFamily: 'monospace'
+                        }}>
+                            Email: 000000<br/>
+                            Password: 000000
+                        </div>
+                        <p style={{margin: '10px 0 0 0', color: 'var(--text-secondary)', fontSize: '12px'}}>
+                            (For testing purposes)
+                        </p>
+                    </div>
+                    
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>Email or Admin Code</label>
+                            <input
+                                type="text"
+                                value={formData.email}
+                                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                placeholder="your.email@formanite.fccollege.edu.pk or 000000 for admin"
+                                required
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Password</label>
+                            <input
+                                type="password"
+                                value={formData.password}
+                                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                placeholder="Enter your password"
+                                required
+                            />
+                        </div>
+                        
+                        {error && <div className="error-message">{error}</div>}
+                        
+                        <button type="submit" className="btn">
+                            Login
+                        </button>
+                    </form>
+                    
+                    <div style={{textAlign: 'center', marginTop: '20px'}}>
+                        <p style={{color: 'var(--text-secondary)'}}>
+                            Don't have an account?{' '}
+                            <button 
+                                onClick={onSwitchToRegister}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--primary)',
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline'
+                                }}
+                            >
+                                Register here
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
+        function RegisterForm({ onRegister, onSwitchToLogin }) {
+            const [selectedRole, setSelectedRole] = useState('');
+            const [formData, setFormData] = useState({
+                name: '',
+                email: '',
+                password: '',
+                confirmPassword: '',
+                major: '',
+                year: 1,
+                phone: ''
+            });
+            const [error, setError] = useState('');
+            const [success, setSuccess] = useState('');
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+                setSuccess('');
+
+                if (!selectedRole) {
+                    setError('Please select a role');
+                    return;
+                }
+
+                if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+                    setError('Please fill in all required fields');
+                    return;
+                }
+
+                if (!dataService.validateEmail(formData.email)) {
+                    setError('Only @formanite.fccollege.edu.pk or @fccollege.edu.pk emails are allowed');
+                    return;
+                }
+
+                if (formData.password !== formData.confirmPassword) {
+                    setError('Passwords do not match');
+                    return;
+                }
+
+                if (formData.password.length < 6) {
+                    setError('Password must be at least 6 characters long');
+                    return;
+                }
+
+                try {
+                    const userData = {
+                        ...formData,
+                        role: selectedRole
+                    };
+                    delete userData.confirmPassword;
+                    
+                    const newUser = await dataService.register(userData);
+                    setSuccess('Registration successful! You can now login.');
+                    setFormData({
+                        name: '',
+                        email: '',
+                        password: '',
+                        confirmPassword: '',
+                        major: '',
+                        year: 1,
+                        phone: ''
+                    });
+                    setSelectedRole('');
+                } catch (err) {
+                    setError(err.message || err);
+                }
+            };
+
+            return (
+                <div className="login-container">
+                    <div className="logo" style={{justifyContent: 'center', marginBottom: '30px'}}>
+                        <i className="fas fa-car"></i>
+                        UniPool
+                    </div>
+                    
+                    <h2 style={{textAlign: 'center', marginBottom: '30px', color: 'var(--text)'}}>
+                        Create Account
+                    </h2>
+                    
+                    <div className="role-selector">
+                        <button
+                            type="button"
+                            className={`role-btn ${selectedRole === 'driver' ? 'active' : ''}`}
+                            onClick={() => setSelectedRole('driver')}
+                        >
+                            <i className="fas fa-car"></i>
+                            Driver
+                        </button>
+                        <button
+                            type="button"
+                            className={`role-btn ${selectedRole === 'rider' ? 'active' : ''}`}
+                            onClick={() => setSelectedRole('rider')}
+                        >
+                            <i className="fas fa-user"></i>
+                            Rider
+                        </button>
+                        <button
+                            type="button"
+                            className={`role-btn ${selectedRole === 'both' ? 'active' : ''}`}
+                            onClick={() => setSelectedRole('both')}
+                        >
+                            <i className="fas fa-user-friends"></i>
+                            Both
+                        </button>
+                    </div>
+                    
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>Full Name *</label>
+                            <input
+                                type="text"
+                                value={formData.name}
+                                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                placeholder="Enter your full name"
+                                required
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Email *</label>
+                            <input
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                placeholder="your.email@formanite.fccollege.edu.pk or your.email@fccollege.edu.pk"
+                                required
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Password *</label>
+                            <input
+                                type="password"
+                                value={formData.password}
+                                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                placeholder="Enter password (min 6 characters)"
+                                required
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Confirm Password *</label>
+                            <input
+                                type="password"
+                                value={formData.confirmPassword}
+                                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                                placeholder="Confirm your password"
+                                required
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Major</label>
+                            <input
+                                type="text"
+                                value={formData.major}
+                                onChange={(e) => setFormData({...formData, major: e.target.value})}
+                                placeholder="e.g., Computer Science"
+                            />
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Year</label>
+                            <select
+                                value={formData.year}
+                                onChange={(e) => setFormData({...formData, year: parseInt(e.target.value)})}
+                            >
+                                <option value={1}>1st Year</option>
+                                <option value={2}>2nd Year</option>
+                                <option value={3}>3rd Year</option>
+                                <option value={4}>4th Year</option>
+                            </select>
+                        </div>
+                        
+                        <div className="form-group">
+                            <label>Phone</label>
+                            <input
+                                type="tel"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                placeholder="e.g., 0300-1234567"
+                            />
+                        </div>
+                        
+                        {error && <div className="error-message">{error}</div>}
+                        {success && <div className="success-message">{success}</div>}
+                        
+                        <button type="submit" className="btn">
+                            Register
+                        </button>
+                    </form>
+                    
+                    <div style={{textAlign: 'center', marginTop: '20px'}}>
+                        <p style={{color: 'var(--text-secondary)'}}>
+                            Already have an account?{' '}
+                            <button 
+                                onClick={onSwitchToLogin}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--primary)',
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline'
+                                }}
+                            >
+                                Login here
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
+        function VerificationForm({ email, userData, onVerificationComplete, onBack }) {
+            const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
+            const [error, setError] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
+            const [canResend, setCanResend] = useState(false);
+            const [displayCode, setDisplayCode] = useState('');
+
+            useEffect(() => {
+                // Send verification code on component mount
+                sendCode();
+                
+                // Timer for countdown
+                const timer = setInterval(() => {
+                    setTimeLeft(prev => {
+                        if (prev <= 1) {
+                            setCanResend(true);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+
+                return () => clearInterval(timer);
+            }, []);
+
+            const sendCode = async () => {
+                setIsLoading(true);
+                const code = dataService.generateVerificationCode();
+                await dataService.sendVerificationEmail(email, code);
+                setDisplayCode(code); // Display the code on screen
+                setIsLoading(false);
+                setTimeLeft(600);
+                setCanResend(false);
+            };
+
+            const handleCodeChange = (index, value) => {
+                if (value.length > 1) return; // Only allow single digit
+                
+                const newCode = [...verificationCode];
+                newCode[index] = value;
+                setVerificationCode(newCode);
+                
+                // Auto-focus next input
+                if (value && index < 5) {
+                    const nextInput = document.getElementById(`code-${index + 1}`);
+                    if (nextInput) nextInput.focus();
+                }
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+                
+                const code = verificationCode.join('');
+                if (code.length !== 6) {
+                    setError('Please enter the complete 6-digit code');
+                    return;
+                }
+
+                setIsLoading(true);
+                const isValid = dataService.verifyCode(email, code);
+                
+                if (isValid) {
+                    try {
+                        const newUser = await dataService.register(userData);
+                        onVerificationComplete(newUser);
+                    } catch (err) {
+                        setError(err);
+                    }
+                } else {
+                    setError('Invalid or expired verification code');
+                }
+                setIsLoading(false);
+            };
+
+            const handleResend = async () => {
+                await sendCode();
+            };
+
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            };
+
+            return (
+                <div className="verification-container">
+                    <div className="logo" style={{justifyContent: 'center', marginBottom: '30px'}}>
+                        <i className="fas fa-car"></i>
+                        UniPool
+                    </div>
+                    
+                    <h2 style={{textAlign: 'center', marginBottom: '10px', color: 'var(--text)'}}>
+                        Verify Your Email
+                    </h2>
+                    
+                    <p style={{color: 'var(--text-secondary)', marginBottom: '20px'}}>
+                        We've sent a 6-digit verification code to <strong>{email}</strong>
+                    </p>
+                    
+                    {/* Display the verification code on screen */}
+                    <div style={{
+                        background: 'var(--border)',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        marginBottom: '20px',
+                        textAlign: 'center'
+                    }}>
+                        <p style={{margin: '0 0 10px 0', color: 'var(--text-secondary)', fontSize: '14px'}}>
+                            <strong>Your Verification Code:</strong>
+                        </p>
+                        <div style={{
+                            fontSize: '24px',
+                            fontWeight: 'bold',
+                            color: 'var(--primary)',
+                            letterSpacing: '5px',
+                            fontFamily: 'monospace'
+                        }}>
+                            {displayCode}
+                        </div>
+                        <p style={{margin: '10px 0 0 0', color: 'var(--text-secondary)', fontSize: '12px'}}>
+                            (This is for demo purposes - in production, this would be sent via email)
+                        </p>
+                    </div>
+                    
+                    <form onSubmit={handleSubmit}>
+                        <div className="verification-code">
+                            {verificationCode.map((digit, index) => (
+                                <input
+                                    key={index}
+                                    id={`code-${index}`}
+                                    type="text"
+                                    maxLength="1"
+                                    value={digit}
+                                    onChange={(e) => handleCodeChange(index, e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Backspace' && !digit && index > 0) {
+                                            const prevInput = document.getElementById(`code-${index - 1}`);
+                                            if (prevInput) prevInput.focus();
+                                        }
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        
+                        {error && <div className="error-message">{error}</div>}
+                        
+                        <button type="submit" className="btn" disabled={isLoading}>
+                            {isLoading ? 'Verifying...' : 'Verify & Complete Registration'}
+                        </button>
+                    </form>
+                    
+                    <div style={{marginTop: '20px'}}>
+                        {timeLeft > 0 ? (
+                            <p style={{color: 'var(--text-secondary)', fontSize: '14px'}}>
+                                Code expires in: {formatTime(timeLeft)}
+                            </p>
+                        ) : (
+                            <button 
+                                className="resend-btn" 
+                                onClick={handleResend}
+                                disabled={!canResend}
+                            >
+                                Resend Code
+                            </button>
+                        )}
+                    </div>
+                    
+                    <div style={{textAlign: 'center', marginTop: '20px'}}>
+                        <button 
+                            onClick={onBack}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--primary)',
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                                fontSize: '14px'
+                            }}
+                        >
+                            ← Back to Registration
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function LocationPicker({ value, onChange, label, placeholder }) {
+            const [dropdownValue, setDropdownValue] = useState('');
+            const [textValue, setTextValue] = useState('');
+
+            useEffect(() => {
+                if (value) {
+                    if (POPULAR_AREAS.includes(value)) {
+                        setDropdownValue(value);
+                        setTextValue('');
+                    } else {
+                        setDropdownValue('Other');
+                        setTextValue(value);
+                    }
+                }
+            }, [value]);
+
+            const handleDropdownChange = (e) => {
+                const val = e.target.value;
+                setDropdownValue(val);
+                if (val && val !== 'Other') {
+                    setTextValue('');
+                    onChange(val);
+                } else if (val === 'Other') {
+                    onChange(textValue);
+                }
+            };
+
+            const handleTextChange = (e) => {
+                const val = e.target.value;
+                setTextValue(val);
+                if (val) {
+                    setDropdownValue('Other');
+                }
+                onChange(val);
+            };
+
+            return (
+                <div className="form-group">
+                    <label>{label}</label>
+                    <div className="location-picker">
+                        <select value={dropdownValue} onChange={handleDropdownChange}>
+                            <option value="">Select area...</option>
+                            {POPULAR_AREAS.map(area => (
+                                <option key={area} value={area}>{area}</option>
+                            ))}
+                        </select>
+                        <span className="or-text">OR</span>
+                        <input
+                            type="text"
+                            placeholder={placeholder || "Enter custom location"}
+                            value={textValue}
+                            onChange={handleTextChange}
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        function PostRideForm({ currentUser, onRidePosted }) {
+            const [formData, setFormData] = useState({
+                pickup: '',
+                dropoff: 'FCC',
+                departureTime: '',
+                seats: 2,
+                recurring: false
+            });
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!currentUser) {
+                    alert('Please login first');
+                    return;
+                }
+
+                // Time restriction: only allow between 6AM and 10PM PKT
+                const dt = new Date(formData.departureTime);
+                const hour = dt.getHours();
+                if (hour < 6 || hour > 22) {
+                    alert('Rides can only be posted between 6AM and 10PM PKT');
+                    return;
+                }
+
+                if (formData.recurring) {
+                    // Pre-generate rides for the next 7 days (Mon-Fri)
+                    let ridesCreated = 0;
+                    for (let i = 0; i < 7; i++) {
+                        const nextDate = new Date(dt);
+                        nextDate.setDate(dt.getDate() + i);
+                        if (nextDate.getDay() === 0 || nextDate.getDay() === 6) continue; // skip Sunday/Saturday
+                        const rideData = {
+                            pickup: formData.pickup,
+                            dropoff: formData.dropoff,
+                            departureTime: nextDate.toISOString(),
+                            seats: formData.seats,
+                            recurring: true,
+                            driverId: currentUser._id,
+                            driverName: currentUser.name,
+                            route: [formData.pickup, formData.dropoff]
+                        };
+                        try {
+                            await dataService.addRide(rideData);
+                            ridesCreated++;
+                        } catch (error) {
+                            console.error('Failed to create recurring ride:', error);
+                        }
+                    }
+                    onRidePosted(`Recurring rides posted for next ${ridesCreated} weekdays!`);
+                } else {
+                    const rideData = {
+                        pickup: formData.pickup,
+                        dropoff: formData.dropoff,
+                        departureTime: formData.departureTime,
+                        seats: formData.seats,
+                        recurring: formData.recurring,
+                        driverId: currentUser._id,
+                        driverName: currentUser.name,
+                        route: [formData.pickup, formData.dropoff]
+                    };
+                    try {
+                        await dataService.addRide(rideData);
+                        onRidePosted('Ride posted successfully!');
+                    } catch (error) {
+                        onRidePosted(error.message || 'Failed to post ride', 'error');
+                    }
+                }
+                setFormData({
+                    pickup: '',
+                    dropoff: 'FCC',
+                    departureTime: '',
+                    seats: 2,
+                    recurring: false
+                });
+            };
+
+            const canPost = currentUser && (currentUser.role === 'driver' || currentUser.role === 'both' || currentUser.role === 'admin');
+
+            return (
+                <div className="card">
+                    <h2><i className="fas fa-car"></i> Post a Ride</h2>
+                    {!canPost && (
+                        <p style={{color: 'var(--error)', marginBottom: '15px'}}>
+                            Only drivers can post rides. Current user role: {currentUser?.role || 'none'}
+                        </p>
+                    )}
+                    <form onSubmit={handleSubmit}>
+                        <LocationPicker
+                            label="Pickup Location"
+                            value={formData.pickup}
+                            onChange={(value) => setFormData({...formData, pickup: value})}
+                            placeholder="Where will you start?"
+                        />
+
+                        <LocationPicker
+                            label="Drop-off Location"
+                            value={formData.dropoff}
+                            onChange={(value) => setFormData({...formData, dropoff: value})}
+                            placeholder="Destination"
+                        />
+
+                        <div className="form-group">
+                            <label>Departure Time</label>
+                            <input
+                                type="datetime-local"
+                                value={formData.departureTime}
+                                onChange={(e) => setFormData({...formData, departureTime: e.target.value})}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Available Seats</label>
+                            <select
+                                value={formData.seats}
+                                onChange={(e) => setFormData({...formData, seats: parseInt(e.target.value)})}
+                            >
+                                <option value={1}>1 seat</option>
+                                <option value={2}>2 seats</option>
+                                <option value={3}>3 seats</option>
+                                <option value={4}>4 seats</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={formData.recurring}
+                                    onChange={(e) => setFormData({...formData, recurring: e.target.checked})}
+                                    style={{marginRight: '8px'}}
+                                />
+                                Recurring ride (weekdays)
+                            </label>
+                        </div>
+
+                        <button type="submit" className="btn" disabled={!canPost}>
+                            Post Ride
+                        </button>
+                    </form>
+                </div>
+            );
+        }
+
+        function RideSearch({ currentUser, onRideBooked }) {
+            const [rides, setRides] = useState([]);
+            const [filters, setFilters] = useState({ pickup: '', dropoff: '' });
+            const [userBookings, setUserBookings] = useState([]);
+            const [error, setError] = useState(null);
+
+            const loadRides = async () => {
+                try {
+                    setError(null);
+                    const allRides = await dataService.getRides(filters);
+                    setRides(Array.isArray(allRides) ? allRides : []);
+                } catch (err) {
+                    console.error('Error loading rides:', err);
+                    setError('Failed to load rides. Please try again.');
+                    setRides([]);
+                }
+            };
+
+            const loadUserBookings = async () => {
+                if (currentUser && currentUser._id) {
+                    try {
+                        const bookings = await dataService.getUserBookings(currentUser._id);
+                        setUserBookings(Array.isArray(bookings) ? bookings : []);
+                    } catch (err) {
+                        console.error('Error loading bookings:', err);
+                        setUserBookings([]);
+                    }
+                }
+            };
+
+            useEffect(() => {
+                loadRides();
+                loadUserBookings();
+            }, [filters, currentUser]);
+
+            const handleSearch = () => {
+                loadRides();
+            };
+
+            const handleBookRide = async (ride) => {
+                if (!currentUser) {
+                    alert('Please login first');
+                    return;
+                }
+
+                if (currentUser._id === ride.driverId) {
+                    alert('You cannot book your own ride');
+                    return;
+                }
+
+                const pickupPoint = prompt('Enter your exact pickup point:');
+                if (!pickupPoint) return;
+
+                const numSeats = prompt(`How many seats do you want to book? (Available: ${ride.availableSeats})`);
+                if (!numSeats) return;
+                
+                const seats = parseInt(numSeats);
+                if (isNaN(seats) || seats <= 0 || seats > ride.availableSeats) {
+                    alert(`Please enter a valid number between 1 and ${ride.availableSeats}`);
+                    return;
+                }
+
+                const bookingData = {
+                    pickupPoint,
+                    numSeats: seats
+                };
+
+                try {
+                    const booking = await dataService.bookRide(ride._id, bookingData);
+                    if (booking) {
+                        onRideBooked(`Successfully booked ${seats} seat(s)!`);
+                        loadRides();
+                        loadUserBookings();
+                    } else {
+                        onRideBooked('Failed to book ride. No seats available.', 'error');
+                    }
+                } catch (error) {
+                    onRideBooked(error.message || 'Failed to book ride', 'error');
+                }
+            };
+
+            const formatTime = (timeString) => {
+                return new Date(timeString).toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            };
+
+            const getRating = (user, type) => {
+                if (!user || !user.ratings || !user.ratings[type] || user.ratings[type].count < 3) {
+                    return null;
+                }
+                return user.ratings[type].total;
+            };
+
+            const isBooked = (rideId) => {
+                return userBookings.some(b => b.rideId === rideId && b.status === 'confirmed');
+            };
+
+            const canBook = currentUser && (currentUser.role === 'rider' || currentUser.role === 'both' || currentUser.role === 'admin');
+
+            return (
+                <div className="card">
+                    <h2><i className="fas fa-search"></i> Find Rides</h2>
+                    
+                    <div className="search-filters">
+                        <input
+                            type="text"
+                            placeholder="From (pickup area)"
+                            value={filters.pickup}
+                            onChange={(e) => setFilters({...filters, pickup: e.target.value})}
+                        />
+                        <input
+                            type="text"
+                            placeholder="To (destination)"
+                            value={filters.dropoff}
+                            onChange={(e) => setFilters({...filters, dropoff: e.target.value})}
+                        />
+                        <button onClick={handleSearch} className="btn">Search</button>
+                    </div>
+
+                    <div style={{maxHeight: '400px', overflowY: 'auto'}}>
+                        {error && (
+                            <div style={{color: 'var(--error)', textAlign: 'center', padding: '10px', marginBottom: '10px'}}>
+                                {error}
+                            </div>
+                        )}
+                        
+                        {/* Available Rides */}
+                        <div style={{marginBottom: '20px'}}>
+                            <h3 style={{color: 'var(--primary)', marginBottom: '10px'}}>
+                                Available Rides ({rides.filter(r => r.availableSeats > 0).length})
+                            </h3>
+                            {rides.filter(r => r.availableSeats > 0).length === 0 ? (
+                                <p style={{textAlign: 'center', color: 'var(--text-secondary)', padding: '10px'}}>
+                                    No available rides found. Try different search terms or post a ride!
+                                </p>
+                            ) : (
+                                rides.filter(r => r.availableSeats > 0).map(ride => {
+                                try {
+                                    const driverData = dataService.getData().users.find(u => u._id === ride.driverId) || {};
+                                    const driverRating = getRating(driverData, 'driver');
+                                    const booked = isBooked(ride._id);
+                                    
+                                    return (
+                                    <div key={ride.id} className="ride-card" style={ride.completed ? {opacity: 0.6, border: '2px solid var(--success)'} : {}}>
+                                        <div className="ride-header">
+                                            <div className="ride-route">
+                                                {ride.pickup} → {ride.dropoff}
+                                            </div>
+                                            {driverRating && (
+                                                <div className="rating">
+                                                    <span className="stars">★</span>
+                                                    <span>{driverRating.toFixed(1)}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="ride-details">
+                                            <div><i className="fas fa-user"></i> {ride.driverName || 'Unknown Driver'}</div>
+                                            <div><i className="fas fa-clock"></i> {ride.departureTime ? formatTime(ride.departureTime) : 'TBD'}</div>
+                                            <div><i className="fas fa-users"></i> {ride.availableSeats || ride.seats || 0} seats left</div>
+                                            <div><i className="fas fa-repeat"></i> {ride.recurring ? 'Recurring' : 'One-time'}</div>
+                                            {ride.completed && (
+                                                <div style={{color: 'var(--success)', fontWeight: 'bold'}}>
+                                                    <i className="fas fa-check-circle"></i> Completed
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {ride.bookings && ride.bookings.length > 0 && (
+                                            <div className="bookings-list">
+                                                <strong>Passengers:</strong>
+                                                {ride.bookings.map((booking, index) => (
+                                                    <div key={index} className="booking-item">
+                                                        {booking.riderName || 'Unknown'} • {booking.pickupPoint || 'TBD'} • {booking.numSeats || 1} seat(s)
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        <div className="ride-actions">
+                                            {booked ? (
+                                                <button className="btn btn-secondary" disabled>
+                                                    Already Booked
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    className="btn" 
+                                                    onClick={() => handleBookRide(ride)}
+                                                    disabled={!canBook || ride.availableSeats === 0}
+                                                >
+                                                    {!canBook ? 'Riders Only' : 
+                                                     ride.availableSeats === 0 ? 'Full' : 'Book Ride'}
+                                                </button>
+                                            )}
+                                                                                        {currentUser && ride.driverId === currentUser._id && new Date(ride.departureTime) > new Date() && (
+                                                <button className="btn btn-secondary" style={{marginLeft: 10}} onClick={async () => {
+                                                    if (!window.confirm('Are you sure you want to cancel this ride? All booked riders will be notified.')) return;
+                                                    try {
+                                                        await dataService.cancelRide(ride._id);
+                                                        onRideBooked('Ride cancelled successfully!');
+                                                        loadRides();
+                                                        loadUserBookings();
+                                                    } catch (error) {
+                                                        onRideBooked(error.message || 'Failed to cancel ride', 'error');
+                                                    }
+                                                }}>
+                                                    Cancel Ride
+                                                </button>
+                                            )}
+                                            {currentUser && ride.driverId === currentUser._id && !ride.completed && new Date(ride.departureTime) < new Date() && (
+                                                <button className="btn" style={{marginLeft: 10, background: 'var(--success)'}} onClick={async () => {
+                                                    if (!window.confirm('Mark this ride as completed?')) return;
+                                                    try {
+                                                        await dataService.completeRide(ride._id);
+                                                        onRideBooked('Ride marked as completed!');
+                                                        loadRides();
+                                                        loadUserBookings();
+                                                    } catch (error) {
+                                                        onRideBooked(error.message || 'Failed to complete ride', 'error');
+                                                    }
+                                                }}>
+                                                    Mark as Completed
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                                } catch (err) {
+                                    console.error('Error rendering ride:', err, ride);
+                                    return (
+                                        <div key={ride._id || Math.random()} className="ride-card">
+                                            <div style={{color: 'var(--error)'}}>
+                                                Error loading ride details
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            })
+                            )}
+                        </div>
+                        
+                        {/* Full Rides */}
+                        <div>
+                            <h3 style={{color: 'var(--text-secondary)', marginBottom: '10px'}}>
+                                Full Rides ({rides.filter(r => r.availableSeats === 0).length})
+                            </h3>
+                            {rides.filter(r => r.availableSeats === 0).map(ride => {
+                                try {
+                                    const driverData = dataService.getData().users.find(u => u._id === ride.driverId) || {};
+                                    const driverRating = getRating(driverData, 'driver');
+                                    
+                                    return (
+                                        <div key={ride._id} className="ride-card" style={{opacity: 0.7}}>
+                                            <div className="ride-header">
+                                                <div className="ride-route">
+                                                    {ride.pickup} → {ride.dropoff}
+                                                </div>
+                                                {driverRating && (
+                                                    <div className="rating">
+                                                        <span className="stars">★</span>
+                                                        <span>{driverRating.toFixed(1)}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            <div className="ride-details">
+                                                <div><i className="fas fa-user"></i> {ride.driverName || 'Unknown Driver'}</div>
+                                                <div><i className="fas fa-clock"></i> {ride.departureTime ? formatTime(ride.departureTime) : 'TBD'}</div>
+                                                <div><i className="fas fa-users" style={{color: 'var(--error)'}}> FULL</i></div>
+                                                <div><i className="fas fa-repeat"></i> {ride.recurring ? 'Recurring' : 'One-time'}</div>
+                                                {ride.completed && (
+                                                    <div style={{color: 'var(--success)', fontWeight: 'bold'}}>
+                                                        <i className="fas fa-check-circle"></i> Completed
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {ride.bookings && ride.bookings.length > 0 && (
+                                                <div className="bookings-list">
+                                                    <strong>Passengers:</strong>
+                                                    {ride.bookings.map((booking, index) => (
+                                                        <div key={index} className="booking-item">
+                                                            {booking.riderName || 'Unknown'} • {booking.pickupPoint || 'TBD'} • {booking.numSeats || 1} seat(s)
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            
+                                            {currentUser && ride.driverId === currentUser._id && !ride.completed && new Date(ride.departureTime) < new Date() && (
+                                                <div className="ride-actions">
+                                                    <button className="btn" style={{background: 'var(--success)'}} onClick={async () => {
+                                                        if (!window.confirm('Mark this ride as completed?')) return;
+                                                        try {
+                                                            await dataService.completeRide(ride._id);
+                                                            onRideBooked('Ride marked as completed!');
+                                                            loadRides();
+                                                            loadUserBookings();
+                                                        } catch (error) {
+                                                            onRideBooked(error.message || 'Failed to complete ride', 'error');
+                                                        }
+                                                    }}>
+                                                        Mark as Completed
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                } catch (err) {
+                                    console.error('Error rendering full ride:', err, ride);
+                                    return (
+                                        <div key={ride._id || Math.random()} className="ride-card">
+                                            <div style={{color: 'var(--error)'}}>
+                                                Error loading ride details
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function RideHistory({ currentUser }) {
+            const [bookings, setBookings] = useState([]);
+            const [showRating, setShowRating] = useState(null); // booking to rate
+            const [ratingData, setRatingData] = useState({ stars: 5, review: '' });
+            const [message, setMessage] = useState('');
+
+            useEffect(() => {
+                if (currentUser && currentUser._id) {
+                    dataService.getUserBookings(currentUser._id).then(setBookings);
+                }
+            }, [currentUser]);
+
+            const handleRate = (booking) => {
+                setShowRating(booking);
+                setRatingData({ stars: 5, review: '' });
+                setMessage('');
+            };
+
+            const handleSubmitRating = async (e) => {
+                e.preventDefault();
+                if (!showRating) return;
+                const data = dataService.getData();
+                const booking = data.bookings.find(b => b.id === showRating.id);
+                const ride = data.rides.find(r => r.id === booking.rideId);
+                if (currentUser._id === booking.driverId) {
+                    booking.driverRating = ratingData.stars;
+                    booking.driverReview = ratingData.review;
+                    ride.driverRating = ratingData.stars;
+                    ride.driverReview = ratingData.review;
+                } else {
+                    booking.riderRating = ratingData.stars;
+                    booking.riderReview = ratingData.review;
+                    ride.riderRating = ratingData.stars;
+                    ride.riderReview = ratingData.review;
+                }
+                booking.completed = true;
+                ride.completed = true;
+                dataService.saveData(data);
+                setShowRating(null);
+                setMessage('Thank you for your feedback!');
+                dataService.getUserBookings(currentUser._id).then(setBookings);
+            };
+
+            return (
+                <div className="card" style={{marginTop: 20}}>
+                    <h2><i className="fas fa-history"></i> Ride History & Ratings</h2>
+                    {message && <div className="success-message">{message}</div>}
+                    {showRating && (
+                        <form onSubmit={handleSubmitRating} style={{marginBottom: 20, background: 'var(--bg-card)', padding: 20, borderRadius: 10}}>
+                            <h3>Rate your recent ride</h3>
+                            <div style={{marginBottom: 10}}>
+                                <label>Stars: </label>
+                                <select value={ratingData.stars} onChange={e => setRatingData({...ratingData, stars: parseInt(e.target.value)})}>
+                                    {[1,2,3,4,5].map(n => <option key={n} value={n}>{n} Star{n>1?'s':''}</option>)}
+                                </select>
+                            </div>
+                            <div style={{marginBottom: 10}}>
+                                <label>Review (optional, max 200 chars):</label>
+                                <textarea maxLength={200} value={ratingData.review} onChange={e => setRatingData({...ratingData, review: e.target.value})} style={{width: '100%', minHeight: 60}} />
+                            </div>
+                            <button className="btn" type="submit">Submit Rating</button>
+                            <button className="btn btn-secondary" type="button" onClick={() => setShowRating(null)} style={{marginLeft: 10}}>Cancel</button>
+                        </form>
+                    )}
+                    <div style={{maxHeight: 300, overflowY: 'auto'}}>
+                        {bookings.length === 0 && <p style={{color: 'var(--text-secondary)'}}>No rides yet.</p>}
+                        {bookings.map((b, i) => (
+                            <div key={b.id} className="ride-card" style={{marginBottom: 10}}>
+                                <div><b>From:</b> {b.ride?.pickup} <b>To:</b> {b.ride?.dropoff} <b>Time:</b> {b.ride ? new Date(b.ride.departureTime).toLocaleString('en-PK') : ''}</div>
+                                <div><b>Role:</b> {currentUser._id === b.driverId ? 'Driver' : 'Rider'}</div>
+                                <div><b>Status:</b> {b.completed ? 'Completed' : 'Upcoming'}</div>
+                                {b.completed && (
+                                    <div style={{marginTop: 5}}>
+                                        <b>Your Rating:</b> {currentUser._id === b.driverId ? b.driverRating : b.riderRating} ★<br/>
+                                        <b>Your Review:</b> {currentUser._id === b.driverId ? b.driverReview : b.riderReview}
+                                    </div>
+                                )}
+                                {!b.completed && new Date(b.ride?.departureTime) < new Date() && (
+                                    <button className="btn" onClick={() => handleRate(b)} style={{marginTop: 10}}>Rate this ride</button>
+                                )}
+                                {!b.completed && new Date(b.ride?.departureTime) > new Date() && currentUser._id === b.driverId && (
+                                    <button className="btn btn-secondary" style={{marginLeft: 10}} onClick={async () => {
+                                        if (!window.confirm('Are you sure you want to cancel this ride? All booked riders will be notified.')) return;
+                                        const data = dataService.getData();
+                                        // Remove the ride
+                                        data.rides = data.rides.filter(r => r.id !== b.rideId);
+                                        // Mark all bookings for this ride as cancelled and notify riders
+                                        data.bookings.forEach(booking => {
+                                            if (booking.rideId === b.rideId) {
+                                                booking.status = 'cancelled';
+                                                booking.driverRating = 1;
+                                                booking.driverReview = 'Ride was cancelled by driver.';
+                                                // Notification (alert for now)
+                                                if (booking.riderId !== currentUser._id) {
+                                                    alert(`Notification: Your ride from ${b.ride?.pickup} to ${b.ride?.dropoff} was cancelled by the driver.`);
+                                                }
+                                            }
+                                        });
+                                        dataService.saveData(data);
+                                        dataService.getUserBookings(currentUser._id).then(setBookings);
+                                    }}>
+                                        Cancel Ride
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function AdminPanel({ currentUser }) {
+            const [users, setUsers] = useState([]);
+
+            useEffect(() => {
+                loadUsers();
+            }, []);
+
+            const loadUsers = async () => {
+                try {
+                    const allUsers = await dataService.getAllUsers();
+                    if (Array.isArray(allUsers)) {
+                        setUsers(allUsers);
+                    } else {
+                        setUsers([]);
+                    }
+                } catch (e) {
+                    setUsers([]);
+                }
+            };
+
+            const handleDeleteUser = async (userId) => {
+                if (window.confirm('Are you sure you want to delete this user?')) {
+                    await dataService.deleteUser(userId);
+                    loadUsers();
+                }
+            };
+
+            return (
+                <div className="admin-panel">
+                    <h2><i className="fas fa-user-shield"></i> Admin Panel</h2>
+                    <p style={{color: 'var(--text-secondary)', marginBottom: '20px'}}>
+                        Manage users and monitor the platform
+                    </p>
+                    
+                    <div className="user-list">
+                        <h3>Registered Users ({users.length})</h3>
+                        {users.map(user => (
+                            <div key={user.id} className="user-item">
+                                <div className="user-info">
+                                    <div style={{fontWeight: 'bold'}}>{user.name}</div>
+                                    <div style={{fontSize: '12px', color: 'var(--text-secondary)'}}>
+                                        {user.email} • {user.role} • {user.major} Year {user.year}
+                                    </div>
+                                </div>
+                                <div className="user-actions">
+                                    <button 
+                                        className="btn btn-small"
+                                        onClick={() => handleDeleteUser(user.id)}
+                                        style={{background: 'var(--error)'}}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        {users.length === 0 && (
+                            <p style={{textAlign: 'center', color: 'var(--text-secondary)', padding: '20px'}}>
+                                No users registered yet.
+                            </p>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [currentUser, setCurrentUser] = useState(null);
+            const [notification, setNotification] = useState(null);
+            const [showLogin, setShowLogin] = useState(true);
+
+            useEffect(() => {
+                const loadCurrentUser = async () => {
+                    try {
+                        const savedUser = await dataService.getCurrentUser();
+                        if (savedUser) {
+                            setCurrentUser(savedUser);
+                        } else {
+                            // Clear any invalid data
+                            dataService.logout();
+                        }
+                    } catch (error) {
+                        console.error('Error loading current user:', error);
+                        // Clear invalid data on error
+                        dataService.logout();
+                    }
+                };
+                loadCurrentUser();
+            }, []);
+
+            const showNotification = (message, type = 'success') => {
+                setNotification({ message, type });
+            };
+
+            const clearNotification = () => {
+                setNotification(null);
+            };
+
+            const handleLogin = (user, token) => {
+                setCurrentUser(user);
+                if (token) localStorage.setItem('token', token);
+                showNotification(`Welcome back, ${user.name}!`);
+            };
+
+            const handleLogout = () => {
+                dataService.logout();
+                setCurrentUser(null);
+                showNotification('Logged out successfully');
+            };
+
+            useEffect(() => {
+                const setTheme = (theme) => {
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                    const btn = document.getElementById('theme-toggle');
+                    if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+                };
+                let theme = localStorage.getItem('theme');
+                if (!theme) theme = 'light';
+                setTheme(theme);
+                const btn = document.getElementById('theme-toggle');
+                if (btn) {
+                    btn.onclick = () => {
+                        const current = document.documentElement.getAttribute('data-theme');
+                        const next = current === 'dark' ? 'light' : 'dark';
+                        setTheme(next);
+                    };
+                }
+            }, [currentUser]);
+
+            if (!currentUser) {
+                return (
+                    <div className="app">
+                        {showLogin ? (
+                            <LoginForm 
+                                onLogin={handleLogin}
+                                onSwitchToRegister={() => setShowLogin(false)}
+                            />
+                        ) : (
+                            <RegisterForm 
+                                onRegister={handleLogin}
+                                onSwitchToLogin={() => setShowLogin(true)}
+                            />
+                        )}
+                    </div>
+                );
+            }
+
+            return (
+                <div className="app">
+                    {notification && (
+                        <Notification 
+                            message={notification.message}
+                            type={notification.type}
+                            onClose={clearNotification}
+                        />
+                    )}
+
+                    <div className="header">
+                        <div className="logo">
+                            <i className="fas fa-car"></i>
+                            UniPool
+                            <span style={{fontSize: '14px', fontWeight: 'normal', marginLeft: '10px', color: 'var(--text-secondary)'}}>
+                                Campus Ride Sharing Platform
+                            </span>
+                        </div>
+                        
+                        <button id="theme-toggle" className="theme-toggle-btn">🌙</button>
+                        <button className="logout-btn" onClick={handleLogout}>
+                            <i className="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                        
+                        <div className="current-user-info">
+                            <div className="user-avatar">
+                                {currentUser?.name?.charAt(0) || 'U'}
+                            </div>
+                            <div>
+                                <div style={{fontWeight: 'bold'}}>{currentUser?.name || 'User'}</div>
+                                <div style={{fontSize: '12px', color: 'var(--text-secondary)'}}>
+                                    {currentUser?.major || 'N/A'} • Year {currentUser?.year || 'N/A'} • {currentUser?.role || 'User'}
+                                </div>
+                            </div>
+                        </div>
+
+                        {notification && (
+                            <div className="header-notification">{notification.message}</div>
+                        )}
+                    </div>
+
+                    {currentUser.role === 'admin' && (
+                        <AdminPanel currentUser={currentUser} />
+                    )}
+
+                    <div className="main-content">
+                        <PostRideForm 
+                            currentUser={currentUser}
+                            onRidePosted={showNotification}
+                        />
+                        
+                        <RideSearch 
+                            currentUser={currentUser}
+                            onRideBooked={showNotification}
+                        />
+
+                        <RideHistory currentUser={currentUser} />
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html> 
